@@ -18,7 +18,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score,GridSearchCV
 
-# ayarlamaları yapıyoruz.
+
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 500)
 
@@ -30,7 +30,7 @@ df = pd.read_csv("1.Grup (Cevahir-Ömer-Osman)/energy_efficiency_data.csv")
 df.describe().T
 df.nunique()
 
-# hızlı bir göz atıyoruz
+
 def check_df(dataframe, head=5):
     print("##################### Shape #####################")
     print(dataframe.shape)
@@ -46,7 +46,6 @@ def check_df(dataframe, head=5):
     print(dataframe.quantile([0, 0.05, 0.50, 0.95, 0.99, 1]).T)
 
 check_df(df)
-# Veri setindeki kategorik, numerik ve kategorik fakat kardinal değişkenlerin isimlerini verir.
 def grab_col_names(dataframe, cat_th=10, car_th=20):
     """
     grab_col_names for given dataframe
@@ -78,16 +77,12 @@ def grab_col_names(dataframe, cat_th=10, car_th=20):
     print(f'cat_but_car: {len(cat_but_car)}')
     print(f'num_but_cat: {len(num_but_cat)}')
 
-    # cat_cols + num_cols + cat_but_car = değişken sayısı.
-    # num_but_cat cat_cols'un içerisinde zaten.
-    # dolayısıyla tüm şu 3 liste ile tüm değişkenler seçilmiş olacaktır: cat_cols + num_cols + cat_but_car
-    # num_but_cat sadece raporlama için verilmiştir.
 
     return cat_cols, cat_but_car, num_cols, num_but_cat
-# Değişken türlerinin ayrıştırılması
+
 cat_cols, cat_but_car, num_cols, num_but_cat = grab_col_names(df)
 
-# categorik değişkenlerin özetine oranına bakıyoruz
+
 def cat_summary(dataframe, col_name, plot=False):
     print(pd.DataFrame({col_name: dataframe[col_name].value_counts(),
                         "Ratio": 100 * dataframe[col_name].value_counts() / len(dataframe)}))
@@ -99,7 +94,7 @@ def cat_summary(dataframe, col_name, plot=False):
 for col in cat_cols:
     cat_summary(df, col)
 
-# numerik değişkenlerin oranına özetine bakıyoruz
+
 def num_summary(dataframe, numerical_col, plot=False):
     quantiles = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.95, 0.99]
     print(dataframe[numerical_col].describe(quantiles).T)
@@ -109,11 +104,10 @@ def num_summary(dataframe, numerical_col, plot=False):
         plt.xlabel(numerical_col)
         plt.title(numerical_col)
         plt.show(block=True)
-# grafikleştirmek için buna bak mutlaka
+
 for col in num_cols:
    num_summary(df, col, plot=True)
 
-# sayısal değişkenler ile hedef değişkenin oranına bakıyoruz
 def target_summary_with_num(dataframe, target, numerical_col):
     print(dataframe.groupby(target).agg({numerical_col: "mean"}), end="\n\n\n")
 
@@ -123,13 +117,10 @@ for col in num_cols:
 for col in num_cols:
     target_summary_with_num(df, ["Cooling_Load"], col)
 
-# kategorik değişkenler ile hedef değişken arasındaki ilişkiye bakıyoruz
 def target_summary_with_cat(dataframe, target, categorical_col):
     print(pd.DataFrame({"TARGET_MEAN": dataframe.groupby(categorical_col)[target].mean()}), end="\n\n\n")
 
-    #         ????????????????????
 
-# değişkenler arasındaki korelasyona bakıyoruz
 def correlation_matrix(df, cols):
     fig = plt.gcf()
     fig.set_size_inches(10, 8)
@@ -139,11 +130,8 @@ def correlation_matrix(df, cols):
     plt.show(block=True)
 
 
-# Sayısal değişkenkerin birbirleri ile korelasyonu
+
 correlation_matrix(df, df.columns)
-# Çatı yüksekliği ile negatif güçlü korelasyon, tüm yükseklik ile poz. güçlü korelasyon
-# demekki çatı yüksekliği ne kadar fazlaysa enerji verimliliği o kadar düşük
-# bina yüksekliği ne kadar yüksekse o kadar yüksek???
 
 
 ##################################################
@@ -173,10 +161,7 @@ for col in num_cols:
     print(col, check_outlier(df, col, 0.25, 0.75))
 
 
-# Standartlaştırma
-# dataframemimizdeki numerik değişkenleri standartlaştırıyoruz
 X_scaled = StandardScaler().fit_transform(df[df.columns])
-# standartlaştırılan numerik değişkenleri isimlendirmeleriyle beraber tekrar dataframemize atıyoruz
 df[df.columns] = pd.DataFrame(X_scaled, columns=df.columns)
 
 df.head()
